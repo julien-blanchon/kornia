@@ -691,7 +691,11 @@ class CenterCrop(GeometricAugmentationBase2D):
     ) -> None:
         # same_on_batch is always True for CenterCrop
         # Since PyTorch does not support ragged tensor. So cropping function happens batch-wisely.
-        super().__init__(p=1.0, return_transform=return_transform, same_on_batch=True, p_batch=p, keepdim=keepdim)
+        super().__init__(p=1.0,
+                         return_transform=return_transform,
+                         same_on_batch=True,
+                         p_batch=p,
+                         keepdim=keepdim)
         if isinstance(size, tuple):
             self.size = (size[0], size[1])
         elif isinstance(size, int):
@@ -824,7 +828,10 @@ class RandomRotation(GeometricAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False,
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         keepdim=keepdim)
         self._param_generator = cast(
             rg.PlainUniformGenerator, rg.PlainUniformGenerator((degrees, "degrees", 0., (-360., 360.)))
         )
@@ -1243,6 +1250,12 @@ class Normalize(IntensityAugmentationBase2D):
     Args:
         mean: Mean for each channel.
         std: Standard deviations for each channel.
+        return_transform: if ``True`` return the matrix describing the transformation applied to each
+                          input tensor. If ``False`` and the input is a tuple the applied transformation
+                          won't be concatenated.
+        p: probability of applying the transformation.
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
 
     Return:
         Normalised tensor with same size as input :math:`(*, C, H, W)`.
@@ -1389,7 +1402,10 @@ class RandomMotionBlur(IntensityAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False,
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         keepdim=keepdim)
         self._param_generator = rg.MotionBlurGenerator(kernel_size, angle, direction)
         self.flags = dict(
             border_type=BorderType.get(border_type),
@@ -1666,6 +1682,8 @@ class RandomGaussianBlur(IntensityAugmentationBase2D):
             input tensor. If ``False`` and the input is a tuple the applied transformation won't be concatenated.
         same_on_batch: apply the same transformation across the batch.
         p: probability of applying the transformation.
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
 
     Shape:
         - Input: :math:`(C, H, W)` or :math:`(B, C, H, W)`, Optional: :math:`(B, 3, 3)`
@@ -1702,7 +1720,11 @@ class RandomGaussianBlur(IntensityAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         p_batch=1.0,
+                         keepdim=keepdim)
         self.flags = dict(
             kernel_size=kernel_size,
             sigma=sigma,
@@ -1728,7 +1750,8 @@ class RandomInvert(IntensityAugmentationBase2D):
             input tensor. If ``False`` and the input is a tuple the applied transformation won't be concatenated.
         same_on_batch: apply the same transformation across the batch.
         p: probability of applying the transformation.
-
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
     .. note::
         This function internally uses :func:`kornia.enhance.invert`.
 
@@ -1758,7 +1781,11 @@ class RandomInvert(IntensityAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         p_batch=1.0,
+                         keepdim=keepdim)
         self.flags = dict(
             max_val=max_val,
         )
@@ -1797,8 +1824,16 @@ class RandomChannelShuffle(IntensityAugmentationBase2D):
         tensor(True)
     """
 
-    def __init__(self, return_transform: bool = False, same_on_batch: bool = False, p: float = 0.5, keepdim: bool = False) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+    def __init__(self,
+                 return_transform: bool = False,
+                 same_on_batch: bool = False,
+                 p: float = 0.5,
+                 keepdim: bool = False) -> None:
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         p_batch=1.0,
+                         keepdim=keepdim)
 
     def generate_parameters(self, shape: torch.Size) -> Dict[str, torch.Tensor]:
         B, C, _, _ = shape
@@ -1826,7 +1861,8 @@ class RandomGaussianNoise(IntensityAugmentationBase2D):
             input tensor. If ``False`` and the input is a tuple the applied transformation won't be concatenated.
         same_on_batch: apply the same transformation across the batch.
         p: probability of applying the transformation.
-
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
     Examples:
         >>> rng = torch.manual_seed(0)
         >>> img = torch.ones(1, 1, 2, 2)
@@ -1850,7 +1886,11 @@ class RandomGaussianNoise(IntensityAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         p_batch=1.0,
+                         keepdim=keepdim)
         self.flags = dict(mean=mean, std=std)
 
     def generate_parameters(self, shape: torch.Size) -> Dict[str, torch.Tensor]:
@@ -1876,7 +1916,8 @@ class RandomFisheye(GeometricAugmentationBase2D):
             input tensor. If ``False`` and the input is a tuple the applied transformation won't be concatenated.
         same_on_batch: apply the same transformation across the batch.
         p: probability of applying the transformation.
-
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
     Examples:
         >>> img = torch.ones(1, 1, 2, 2)
         >>> center_x = torch.tensor([-.3, .3])
@@ -1903,7 +1944,11 @@ class RandomFisheye(GeometricAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         p_batch=1.0,
+                         keepdim=keepdim)
         self._check_tensor(center_x)
         self._check_tensor(center_y)
         self._check_tensor(gamma)
@@ -2038,7 +2083,8 @@ class RandomThinPlateSpline(GeometricAugmentationBase2D):
             input tensor. If ``False`` and the input is a tuple the applied transformation won't be concatenated.
         same_on_batch: apply the same transformation across the batch.
         p: probability of applying the transformation.
-
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
     .. note::
         This function internally uses :func:`kornia.geometry.transform.warp_image_tps`.
 
@@ -2064,7 +2110,11 @@ class RandomThinPlateSpline(GeometricAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch,
+                         p_batch=1.0,
+                         keepdim=keepdim)
         self.flags = dict(align_corners=align_corners)
         self.dist = torch.distributions.Uniform(-scale, scale)
 
@@ -2102,7 +2152,8 @@ class RandomBoxBlur(IntensityAugmentationBase2D):
             input tensor. If ``False`` and the input is a tuple the applied transformation won't be concatenated.
         same_on_batch (bool): apply the same transformation across the batch.
         p: probability of applying the transformation.
-
+        keepdim: whether to keep the output shape the same as input (True) or broadcast it
+                 to the batch form (False).
     .. note::
         This function internally uses :func:`kornia.filters.box_blur`.
 
@@ -2129,7 +2180,10 @@ class RandomBoxBlur(IntensityAugmentationBase2D):
         p: float = 0.5,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=p, return_transform=return_transform, same_on_batch=same_on_batch, p_batch=1.0, keepdim=keepdim)
+        super().__init__(p=p,
+                         return_transform=return_transform,
+                         same_on_batch=same_on_batch, p_batch=1.0,
+                         keepdim=keepdim)
         self.flags = dict(
             kernel_size=kernel_size,
             border_type=border_type,
@@ -2193,7 +2247,11 @@ class PadTo(GeometricAugmentationBase2D):
         return_transform: bool = False,
         keepdim: bool = False
     ) -> None:
-        super().__init__(p=1., return_transform=return_transform, same_on_batch=True, p_batch=1., keepdim=keepdim)
+        super().__init__(p=1.,
+                         return_transform=return_transform,
+                         same_on_batch=True,
+                         p_batch=1.,
+                         keepdim=keepdim)
         self.flags = dict(
             size=size,
             pad_mode=pad_mode,
